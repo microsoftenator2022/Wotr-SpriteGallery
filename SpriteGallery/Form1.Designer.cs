@@ -65,7 +65,7 @@
             assetIDTextBox.Name = "assetIDTextBox";
             assetIDTextBox.ReadOnly = true;
             assetIDTextBox.Size = new Size(231, 21);
-            assetIDTextBox.TabIndex = 6;
+            assetIDTextBox.TabIndex = 3;
             assetIDTextBox.Text = "0000000000000000f000000000000000";
             // 
             // spriteTileBig
@@ -101,7 +101,7 @@
             nameTextBox.Name = "nameTextBox";
             nameTextBox.ReadOnly = true;
             nameTextBox.Size = new Size(231, 21);
-            nameTextBox.TabIndex = 4;
+            nameTextBox.TabIndex = 2;
             // 
             // label2
             // 
@@ -124,7 +124,7 @@
             fileIDTextBox.Name = "fileIDTextBox";
             fileIDTextBox.ReadOnly = true;
             fileIDTextBox.Size = new Size(231, 21);
-            fileIDTextBox.TabIndex = 7;
+            fileIDTextBox.TabIndex = 4;
             // 
             // label3
             // 
@@ -149,13 +149,14 @@
             // 
             gridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             gridView.AutoScroll = true;
+            gridView.AutoScrollMinSize = new Size(1, 462);
             gridView.BackColor = SystemColors.ControlDarkDark;
             gridView.ForeColor = SystemColors.Highlight;
             gridView.Location = new Point(12, 41);
             gridView.Name = "gridView";
             gridView.Padding = new Padding(0, 0, 17, 0);
             gridView.Size = new Size(630, 508);
-            gridView.TabIndex = 10;
+            gridView.TabIndex = 1;
             gridView.TileHeight = 64;
             gridView.TileMargin = 1;
             gridView.TileWidth = 64;

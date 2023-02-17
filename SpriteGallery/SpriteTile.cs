@@ -76,7 +76,6 @@ namespace SpriteGallery
         protected override void OnPaint(PaintEventArgs pe)
         {
             base.OnPaint(pe);
-            pe.Graphics.Clear(Color.Transparent);
             if (Image is not null && NeedsUpdate)
             {
                 var currentState = new Bitmap(this.Width, this.Height);
@@ -92,6 +91,7 @@ namespace SpriteGallery
             }
 
             if (Image is null) pe.Graphics.Clear(BackColor);
+
             else pe.Graphics.DrawImage(Image, 0, 0, this.Width, this.Height);
 
             //if ((Parent as SpriteGridView)?.Selected == this)

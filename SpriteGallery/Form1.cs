@@ -9,8 +9,10 @@ namespace SpriteGallery
         {
             InitializeComponent();
 
-            gridView.SelectedChanged += sprite =>
+            gridView.SelectedChanged += (tile, _) =>
             {
+                var sprite = gridView.GetSprite(tile);
+
                 spriteTileBig.Sprite = sprite;
 
                 if (sprite is null)
@@ -33,13 +35,6 @@ namespace SpriteGallery
             assetIDTextBox.Text = "";
             base.OnLoad(e);
         }
-
-        //protected override void OnResizeEnd(EventArgs e)
-        //{
-        //    base.OnResizeEnd(e);
-
-        //    gridView.ApplyLayout();
-        //}
 
         private void OpenBundleButton_Click(object sender, EventArgs e)
         {
@@ -69,7 +64,7 @@ namespace SpriteGallery
                     }
                 });
 
-                //var chunkSize = gridView.Columns * gridView.VisibleRows;
+
                 var chunkSize = 1;
 
                 foreach (var sprites in Sprites.Sprites.Chunk(chunkSize))

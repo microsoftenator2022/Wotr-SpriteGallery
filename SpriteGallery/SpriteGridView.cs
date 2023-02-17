@@ -15,8 +15,11 @@ using WikiGen.Assets;
 
 namespace SpriteGallery
 {
+    
     public partial class SpriteGridView : ScrollableControl
     {
+        public readonly record struct Tile(int Column, int Row);
+
         internal readonly List<BlueprintSprites.SpriteInfo> Sprites = new();
 
         public int TileWidth { get; set; } = 64;
@@ -31,22 +34,18 @@ namespace SpriteGallery
         public int Rows => Math.Max((Sprites.Count / Columns) + 1, VisibleRows);
         public int InternalHeight => Rows * RowHeight;
 
-        private Point TilePosition(int column, int row, bool includeAutoScrollY = true)
+        private int IndexForTile(Tile tile) => ((tile.Row) * Columns) + tile.Column;
+
+        private Tile TileForIndex(int index) => new(index % Columns, index / Columns);
+
+        private Point TilePosition(Tile tile, bool includeAutoScrollY = true)
         {
-            var x = TileMargin + (column * ColumnWidth);
-            var y = TileMargin + (row * RowHeight);
+            var x = TileMargin + (tile.Column * ColumnWidth);
+            var y = TileMargin + (tile.Row * RowHeight);
 
             if (includeAutoScrollY) y += this.AutoScrollPosition.Y;
 
             return new(x, y);
-        }
-
-        private Point TilePosition(int index)
-        {
-            var row = index / Columns;
-            var column = index % Columns;
-
-            return TilePosition(column, row);
         }
 
         internal void ApplyLayout()
@@ -55,20 +54,13 @@ namespace SpriteGallery
             this.Refresh();
         }
 
-        internal void DrawSprite(int index, BlueprintSprites.SpriteInfo sprite, Graphics g)
+        private void DrawSprite(int index, BlueprintSprites.SpriteInfo sprite, Graphics g)
         {
-            var position = TilePosition(index);
+            var rect = TileRect(TileForIndex(index));
 
-            g.DrawRectangle(
-                new Pen(this.BackColor, 1),
-                position.X - TileMargin,
-                position.Y - TileMargin,
-                ColumnWidth,
-                RowHeight);
+            g.FillRectangle(new SolidBrush(Color.Black), rect);
 
-            g.FillRectangle(new SolidBrush(Color.Black), position.X, position.Y, TileWidth, TileHeight);
-
-            g.DrawImage(sprite.Image, position.X, position.Y, TileWidth, TileHeight);
+            g.DrawImage(sprite.Image, rect);
             
         }
 
@@ -77,6 +69,12 @@ namespace SpriteGallery
             ApplyLayout();
 
             base.OnResize(e);
+        }
+
+        private Rectangle TileRect(Tile tile)
+        {
+            var point = TilePosition(tile);
+            return new Rectangle(point.X, point.Y, TileWidth, TileHeight);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -90,65 +88,75 @@ namespace SpriteGallery
                 DrawSprite(index, sprite, g);
             }
 
-            if (selectedIndex >= 0)
+            if (Selected is Tile tile)
             {
-                var point = TilePosition(selectedIndex);
-                var rect = new Rectangle(point.X + 2, point.Y + 2, TileWidth - 4, TileHeight - 4);
+                var clip = g.Clip;
+                
+                var tileRect = TileRect(tile);
+                
+                g.SetClip(tileRect);
 
-                g.DrawRectangle(new Pen(ForeColor, 4), rect);
+                g.DrawRectangle(new Pen(ForeColor, 8), tileRect);
+
+                g.Clip = clip;
             }
         }
 
-        private int selectedIndex = -1;
-        internal BlueprintSprites.SpriteInfo? Selected =>
-            selectedIndex < 0 ? null : Sprites[selectedIndex];
-
-        internal event Action<BlueprintSprites.SpriteInfo?> SelectedChanged;
-
-        internal (int, BlueprintSprites.SpriteInfo?) SpriteAtPoint(int x, int y)
+        internal BlueprintSprites.SpriteInfo? GetSprite(Tile? tile)
         {
-            var column = x / ColumnWidth;
-            var row = (y - this.AutoScrollPosition.Y) / RowHeight;
+            if(tile is not Tile t) return null;
 
-            var index = IndexForTile(column, row);
+            var index = IndexForTile(t);
 
-            return Sprites.Count > index ? (index, Sprites[index]) : (-1, null);
+            return Sprites.Count > index ? Sprites[index] : null;
         }
 
-        internal (int, BlueprintSprites.SpriteInfo?) SpriteAtPoint(Point location) =>
-            SpriteAtPoint(location.X, location.Y);
+        internal BlueprintSprites.SpriteInfo? SelectedSprite => GetSprite(Selected);
 
-        private int IndexForTile(int column, int row) =>
-            ((row) * Columns) + column;
-
-        protected void UpdateSelected(Point location)
+        internal Tile? Selected { get; private set; }
+        
+        internal void SetSelected(Tile? tile)
         {
-            var previous = selectedIndex;
-            
-            var (index, sprite) = SpriteAtPoint(location);
+            var previous = Selected;
+            Selected = tile;
 
-            selectedIndex = index;
+            OnSelectedChanged(Selected, previous);
+        }
 
-            SelectedChanged(sprite);
+        public event Action<Tile?, Tile?>? SelectedChanged;
+        
+        protected void OnSelectedChanged(Tile? tile, Tile? previous)
+        {
+            SelectedChanged?.Invoke(tile, previous);
 
-            if(selectedIndex >= 0)
+            if (tile is Tile selectedTile)
             {
-                var point = TilePosition(index);
-                var rect = new Rectangle(point.X, point.Y, TileWidth, TileHeight);
-
-                this.Invalidate(rect);
+                this.Invalidate(TileRect(selectedTile));
             }
 
-            if (previous >= 0)
+            if (previous is Tile previousTile)
             {
-                var previousLocation = TilePosition(previous);
-                var previousRect = new Rectangle(previousLocation.X, previousLocation.Y, TileWidth, TileHeight);
-
-                this.Invalidate(previousRect);
+                this.Invalidate(TileRect(previousTile));
             }
 
             this.Update();
         }
+
+        internal Tile? TileAtPoint(Point location)
+        {
+            var column = location.X / ColumnWidth;
+            var row = (location.Y - this.AutoScrollPosition.Y) / RowHeight;
+
+            if (column >= Columns || row >= Rows) return null;
+
+            var tile = new Tile(column, row);
+
+            var index = IndexForTile(tile);
+
+            return Sprites.Count > index ? tile : null;
+        }
+
+        protected void SelectTileAtPosition(Point point) => SetSelected(TileAtPoint(point));
 
         protected override void OnMouseClick(MouseEventArgs e)
         {
@@ -156,7 +164,10 @@ namespace SpriteGallery
 
             if (e.Button != MouseButtons.Left) return;
 
-            UpdateSelected(e.Location);
+            this.Focus();
+            this.Select();
+
+            SelectTileAtPosition(e.Location);
         }
 
         public override Color ForeColor
@@ -165,8 +176,18 @@ namespace SpriteGallery
             set => base.ForeColor = value;
         }
 
+
+        //public event EventHandler? GotFocus;
+        protected override void OnGotFocus(EventArgs e)
+        {
+            
+        }
+
         public SpriteGridView()
         {
+            this.SetStyle(ControlStyles.ContainerControl, false);
+            this.SetStyle(ControlStyles.Selectable, true);
+
             this.DoubleBuffered = true;
 
             InitializeComponent();
@@ -176,7 +197,7 @@ namespace SpriteGallery
 
             Padding = new Padding(0, 0, SystemInformation.VerticalScrollBarWidth, 0);
 
-            SelectedChanged += sprite => { };
+            //SelectedChanged += sprite => { };
         }
     }
 }

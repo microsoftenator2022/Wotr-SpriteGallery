@@ -52,31 +52,31 @@ printfn "%A" bpContext.AssetRefs.Count
 // |> printfn "%s"
 
 
-// let blueprintAssets = BlueprintAssetsContext("BlueprintReferencedAssets.json")
+let blueprintAssets = BlueprintAssetsContext(bprTree)
 
-// let sprites =
-//     blueprintAssets.refToAsset
-//     |> Seq.choose (fun x ->
-//         let path = x.Value.m_PathID
-//         if bundle.ObjectLookup.Keys |> Seq.contains path then
-//             (x.Key, bundle.LookupObject path) |> Some
-//         else None)
-//     |> Seq.where (fun (_, o) -> o.ClassType = ClassIDType.Sprite)
-//     |> Seq.map (fun (id, o) ->
-//         use reader = new AssetFileReader(o)
-//         let sprite = Sprite reader
-//         id, sprite)
+let sprites =
+    blueprintAssets.refToAsset
+    |> Seq.choose (fun x ->
+        let path = x.Value.m_PathID
+        if bundle.ObjectLookup.Keys |> Seq.contains path then
+            (x.Key, bundle.LookupObject path) |> Some
+        else None)
+    |> Seq.where (fun (_, o) -> o.ClassType = ClassIDType.Sprite)
+    |> Seq.map (fun (id, o) ->
+        use reader = new AssetFileReader(o)
+        let sprite = Sprite reader
+        id, sprite)
 
-// let tryGetSprite sprite =
-//     let mutable (maybeBitmap : Bitmap) = null
+let tryGetSprite sprite =
+    let mutable (maybeBitmap : Bitmap) = null
 
-//     if (BlueprintAssetsContext.TryRenderSprite(sprite, &maybeBitmap)) then
-//         Some maybeBitmap
-//     else None
+    if (BlueprintAssetsContext.TryRenderSprite(sprite, &maybeBitmap)) then
+        Some maybeBitmap
+    else None
 
-// for (id, sprite) in sprites do
-//     printfn "%s (%s)" id sprite.Name 
-//     tryGetSprite sprite
-//     |> function
-//     | Some s -> s.Save($"sprites/{id}.png", ImageFormat.Png)
-//     | None -> ()
+for (id, sprite) in sprites do
+    printfn "%s (%s)" id sprite.Name 
+    tryGetSprite sprite
+    |> function
+    | Some s -> s.Save($"sprites/{id}.png", ImageFormat.Png)
+    | None -> ()
