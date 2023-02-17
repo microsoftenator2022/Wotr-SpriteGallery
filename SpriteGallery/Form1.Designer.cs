@@ -160,6 +160,7 @@
             gridView.TileHeight = 64;
             gridView.TileMargin = 1;
             gridView.TileWidth = 64;
+            gridView.KeyUp += gridView_KeyPress;
             // 
             // Form1
             // 

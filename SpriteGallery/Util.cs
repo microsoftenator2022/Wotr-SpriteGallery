@@ -39,13 +39,14 @@ namespace SpriteGallery.Util
                 }
                 catch (Exception e)
                 {
-                    if (retries++ > numRetries)
+                    if (retries > numRetries)
                     {
                         throw new Exception($"Failed after {retries} retries: {e.ToString()}", e);
                     }
 
                     if(delayMs > 0) Thread.Sleep(delayMs);
                 }
+                finally { retries++; }
             }
 
             return result;

@@ -34,9 +34,9 @@ namespace SpriteGallery
         public int Rows => Math.Max((Sprites.Count / Columns) + 1, VisibleRows);
         public int InternalHeight => Rows * RowHeight;
 
-        private int IndexForTile(Tile tile) => ((tile.Row) * Columns) + tile.Column;
+        public int IndexForTile(Tile tile) => ((tile.Row) * Columns) + tile.Column;
 
-        private Tile TileForIndex(int index) => new(index % Columns, index / Columns);
+        public Tile TileForIndex(int index) => new(index % Columns, index / Columns);
 
         private Point TilePosition(Tile tile, bool includeAutoScrollY = true)
         {
@@ -88,7 +88,7 @@ namespace SpriteGallery
                 DrawSprite(index, sprite, g);
             }
 
-            if (Selected is Tile tile)
+            if (Focused && Selected is Tile tile)
             {
                 var clip = g.Clip;
                 
@@ -96,7 +96,7 @@ namespace SpriteGallery
                 
                 g.SetClip(tileRect);
 
-                g.DrawRectangle(new Pen(ForeColor, 8), tileRect);
+                g.DrawRectangle(new Pen(this.ForeColor, 8), tileRect);
 
                 g.Clip = clip;
             }
@@ -123,7 +123,7 @@ namespace SpriteGallery
             OnSelectedChanged(Selected, previous);
         }
 
-        public event Action<Tile?, Tile?>? SelectedChanged;
+        public event Action<Tile?, Tile?> SelectedChanged;
         
         protected void OnSelectedChanged(Tile? tile, Tile? previous)
         {
@@ -142,7 +142,7 @@ namespace SpriteGallery
             this.Update();
         }
 
-        internal Tile? TileAtPoint(Point location)
+        private Tile? TileAtPoint(Point location)
         {
             var column = location.X / ColumnWidth;
             var row = (location.Y - this.AutoScrollPosition.Y) / RowHeight;
@@ -163,24 +163,30 @@ namespace SpriteGallery
             base.OnMouseClick(e);
 
             if (e.Button != MouseButtons.Left) return;
-
-            this.Focus();
-            this.Select();
-
+            
             SelectTileAtPosition(e.Location);
+            this.Focus();
         }
-
-        public override Color ForeColor
-        {
-            get => base.ForeColor;
-            set => base.ForeColor = value;
-        }
-
-
-        //public event EventHandler? GotFocus;
+        
         protected override void OnGotFocus(EventArgs e)
         {
-            
+            if (Selected is Tile tile)
+            {
+                this.Invalidate(TileRect(tile));
+            }
+
+            base.OnGotFocus(e);
+            this.Select();
+        }
+
+        protected override void OnLostFocus(EventArgs e)
+        {
+            if (Selected is Tile tile)
+            {
+                this.Invalidate(TileRect(tile));
+            }
+
+            base.OnLostFocus(e);
         }
 
         public SpriteGridView()
@@ -197,7 +203,142 @@ namespace SpriteGallery
 
             Padding = new Padding(0, 0, SystemInformation.VerticalScrollBarWidth, 0);
 
-            //SelectedChanged += sprite => { };
+            SelectedChanged += (selected, _) =>
+            {
+
+                Rectangle? tileRect = selected is Tile t ? TileRect(t) : null;
+
+                if (tileRect is Rectangle rect)
+                {
+                    var dummy = new Control { Top = rect.Y, Left = rect.X, Height = rect.Height, Width = 0 };
+                    Controls.Add(dummy);
+                    this.ScrollControlIntoView(dummy);
+                    Controls.Remove(dummy);
+                }
+            };
+        }
+
+        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        {
+            switch (e.KeyData)
+            {
+                case var k when k.HasFlag(Keys.Right):
+                    MoveSelection(Direction.Right);
+                    break;
+                case var k when k.HasFlag(Keys.Up):
+                    MoveSelection(Direction.Up);
+                    break;
+                case var k when k.HasFlag(Keys.Left):
+                    MoveSelection(Direction.Left);
+                    break;
+                case var k when k.HasFlag(Keys.Down):
+                    MoveSelection(Direction.Down);
+                    break;
+                default:
+                    base.OnPreviewKeyDown(e);
+                    return;
+            }
+
+            e.IsInputKey = true;
+        }
+
+        private enum Direction
+        {
+            None,
+            Up,
+            Right,
+            Down,
+            Left
+        }
+
+        private Direction KeyToDirection(Keys key)
+        {
+            if (key == Keys.Right) return Direction.Right;
+            if (key == Keys.Up) return Direction.Up;
+            if (key == Keys.Left) return Direction.Left;
+            if (key == Keys.Down) return Direction.Down;
+
+
+            return Direction.None;
+        }
+
+        private Direction movedOne = Direction.None;
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (KeyToDirection(e.KeyData) == movedOne)
+                movedOne = Direction.None;
+
+            base.OnKeyUp(e);
+        }
+
+        private void MoveSelection(Direction d)
+        {
+            if (d is Direction.None) return;
+
+            if (Selected is not Tile selected)
+            {
+                switch (d)
+                {
+                    case Direction.Right:
+                    case Direction.Down:
+                        SetSelected(new Tile(0, 0));
+                        break;
+                    case Direction.Left:
+                        SetSelected(TileForIndex(Sprites.Count - 1));
+                        break;
+                    case Direction.Up:
+                        SetSelected(new Tile(0,
+                            TileForIndex(Sprites.Count - 1).Row));
+                        break;
+                }
+            }
+            else
+            { 
+                var index = IndexForTile(selected);
+
+                switch (d)
+                {
+                    case Direction.Right:
+                        if (index + 1 < Sprites.Count)
+                            SetSelected(TileForIndex(index + 1));
+                        else
+                            if (movedOne != d)
+                                SetSelected(TileForIndex(0));
+                        break;
+                    case Direction.Down:
+                        if (index + Columns < Sprites.Count)
+                            SetSelected(TileForIndex(index + Columns));
+                        else
+                            if(movedOne != d)
+                                SetSelected(new Tile(selected.Column, 0));
+                        break;
+                    case Direction.Left:
+                        if (index > 0)
+                            SetSelected(TileForIndex(index - 1));
+                        else
+                            if (movedOne != d)
+                                SetSelected(TileForIndex(Sprites.Count - 1));
+                        break;
+                    case Direction.Up:
+                        if (index >= Columns)
+                            SetSelected(TileForIndex(index - Columns));
+                        else if (movedOne != d)
+                        { 
+                            if (index > 0)
+                                SetSelected(TileForIndex(0));
+                            else
+                            {
+                                var tile = new Tile(selected.Column, Rows - 1);;
+                                if(IndexForTile(tile) >= Sprites.Count)
+                                    SetSelected(TileForIndex(Sprites.Count - 1));
+                                else SetSelected(tile);
+                            }
+                        }
+                        break;
+                }
+            }
+            movedOne = d;
         }
     }
 }

@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+
+using SpriteGallery.Util;
 
 namespace SpriteGallery
 {
@@ -25,6 +28,7 @@ namespace SpriteGallery
                 assetIDTextBox.Text = $"{sprite.Value.AssetId}";
                 nameTextBox.Text = $"{sprite.Value.Sprite.Name}";
                 fileIDTextBox.Text = $"{sprite.Value.FileId}";
+
             };
         }
 
@@ -84,6 +88,25 @@ namespace SpriteGallery
             });
 
             loadTask.Start();
+        }
+
+        private void CopySelectedSpriteToClipboard()
+        {
+            if (gridView.SelectedSprite is not BlueprintSprites.SpriteInfo sprite) return;
+
+            Utils.Retry(() => Clipboard.SetImage(sprite.Image), 3, 100);
+
+            this.Text = "Copied";
+        }
+
+        private void gridView_KeyPress(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyData)
+            {
+                case var k when k.HasFlag(Keys.Control) && k.HasFlag(Keys.C) :
+                    CopySelectedSpriteToClipboard();
+                    break;
+            }
         }
     }
 }
