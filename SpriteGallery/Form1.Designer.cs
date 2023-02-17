@@ -38,6 +38,7 @@
             label3 = new Label();
             progressBar1 = new ProgressBar();
             gridView = new SpriteGridView();
+            label4 = new Label();
             SuspendLayout();
             // 
             // OpenBundleButton
@@ -162,12 +163,23 @@
             gridView.TileWidth = 64;
             gridView.KeyUp += gridView_KeyPress;
             // 
+            // label4
+            // 
+            label4.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label4.AutoSize = true;
+            label4.Location = new Point(711, 492);
+            label4.Name = "label4";
+            label4.Size = new Size(221, 60);
+            label4.TabIndex = 10;
+            label4.Text = "Keyboard shortcuts:\r\n\r\nCtrl-C: Copy selected sprite to clipboard\r\nArrows: Page Up/Down - Move selection";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLight;
             ClientSize = new Size(944, 561);
+            Controls.Add(label4);
             Controls.Add(gridView);
             Controls.Add(progressBar1);
             Controls.Add(label3);
@@ -196,5 +208,6 @@
         private Label label3;
         private ProgressBar progressBar1;
         private SpriteGridView gridView;
+        private Label label4;
     }
 }
