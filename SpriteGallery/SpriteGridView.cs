@@ -117,6 +117,8 @@ namespace SpriteGallery
         
         internal void SetSelected(Tile? tile)
         {
+            if (tile == Selected) return;
+
             var previous = Selected;
             Selected = tile;
 
@@ -234,6 +236,12 @@ namespace SpriteGallery
                 case var k when k.HasFlag(Keys.Down):
                     MoveSelection(Direction.Down);
                     break;
+                case var k when k.HasFlag(Keys.PageUp):
+                    MoveSelection(Direction.PageUp);
+                    break;
+                case var k when k.HasFlag(Keys.PageDown):
+                    MoveSelection(Direction.PageDown);
+                    break;
                 default:
                     base.OnPreviewKeyDown(e);
                     return;
@@ -248,7 +256,9 @@ namespace SpriteGallery
             Up,
             Right,
             Down,
-            Left
+            Left,
+            PageUp,
+            PageDown,
         }
 
         private Direction KeyToDirection(Keys key)
@@ -257,7 +267,8 @@ namespace SpriteGallery
             if (key == Keys.Up) return Direction.Up;
             if (key == Keys.Left) return Direction.Left;
             if (key == Keys.Down) return Direction.Down;
-
+            if (key == Keys.PageUp) return Direction.PageUp;
+            if (key == Keys.PageDown) return Direction.PageDown;
 
             return Direction.None;
         }
@@ -329,12 +340,23 @@ namespace SpriteGallery
                                 SetSelected(TileForIndex(0));
                             else
                             {
-                                var tile = new Tile(selected.Column, Rows - 1);;
-                                if(IndexForTile(tile) >= Sprites.Count)
+                                var tileUp = new Tile(selected.Column, Rows - 1);;
+                                if(IndexForTile(tileUp) >= Sprites.Count)
                                     SetSelected(TileForIndex(Sprites.Count - 1));
-                                else SetSelected(tile);
+                                else SetSelected(tileUp);
                             }
                         }
+                        break;
+                    case Direction.PageUp:
+                        if (selected.Row - VisibleRows > 0)
+                            SetSelected(new Tile(selected.Column, selected.Row - VisibleRows));
+                        else SetSelected(new Tile(selected.Column, 0));
+                        break;
+                    case Direction.PageDown:
+                        var tilePageDown = new Tile(selected.Column, selected.Row + VisibleRows);
+
+                        if (IndexForTile(tilePageDown) >= Sprites.Count) SetSelected(TileForIndex(Sprites.Count - 1));
+                        else SetSelected(tilePageDown);
                         break;
                 }
             }
