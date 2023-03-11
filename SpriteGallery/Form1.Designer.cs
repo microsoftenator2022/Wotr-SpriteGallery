@@ -59,15 +59,14 @@
             // assetIDTextBox
             // 
             assetIDTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            assetIDTextBox.BackColor = SystemColors.ControlLight;
             assetIDTextBox.BorderStyle = BorderStyle.FixedSingle;
             assetIDTextBox.Font = new Font("Cascadia Mono", 9F, FontStyle.Regular, GraphicsUnit.Point);
             assetIDTextBox.Location = new Point(703, 175);
             assetIDTextBox.Name = "assetIDTextBox";
-            assetIDTextBox.ReadOnly = true;
             assetIDTextBox.Size = new Size(231, 21);
             assetIDTextBox.TabIndex = 3;
             assetIDTextBox.Text = "0000000000000000f000000000000000";
+            assetIDTextBox.KeyDown += assetIDTextBox_KeyDown;
             // 
             // spriteTileBig
             // 
@@ -118,14 +117,13 @@
             // fileIDTextBox
             // 
             fileIDTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            fileIDTextBox.BackColor = SystemColors.ControlLight;
             fileIDTextBox.BorderStyle = BorderStyle.FixedSingle;
             fileIDTextBox.Font = new Font("Cascadia Mono", 9F, FontStyle.Regular, GraphicsUnit.Point);
             fileIDTextBox.Location = new Point(703, 202);
             fileIDTextBox.Name = "fileIDTextBox";
-            fileIDTextBox.ReadOnly = true;
             fileIDTextBox.Size = new Size(231, 21);
             fileIDTextBox.TabIndex = 4;
+            fileIDTextBox.KeyDown += fileIDTextBox_KeyDown;
             // 
             // label3
             // 

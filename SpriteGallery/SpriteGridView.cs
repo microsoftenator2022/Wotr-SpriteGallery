@@ -22,6 +22,17 @@ namespace SpriteGallery
 
         internal readonly List<BlueprintSprites.SpriteInfo> Sprites = new();
 
+        internal IEnumerable<(Tile tile, BlueprintSprites.SpriteInfo sprite)> Tiles
+        {
+            get
+            {
+                for (var i = 0; i < Sprites.Count; i++)
+                {
+                    yield return (TileForIndex(i), Sprites[i]);
+                }
+            }
+        }
+
         public int TileWidth { get; set; } = 64;
         public int TileHeight { get; set; } = 64;
         public int TileMargin { get; set; } = 1;

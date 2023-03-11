@@ -21,9 +21,6 @@ namespace SpriteGallery.Util
 
     public static class Utils
     {
-        public static void Retry(Action action, int numRetries = 1, int delayMs = 0) =>
-            Retry<object?>(() => { action(); return null; }, numRetries, delayMs);
-
         public static T Retry<T>(Func<T> func, int numRetries = 1, int delayMs = 0)
         {
             var retries = 0;
@@ -41,7 +38,7 @@ namespace SpriteGallery.Util
                 {
                     if (retries > numRetries)
                     {
-                        throw new Exception($"Failed after {retries} retries: {e.ToString()}", e);
+                        throw new Exception($"Failed after {retries} retries: {e}", e);
                     }
 
                     if(delayMs > 0) Thread.Sleep(delayMs);
@@ -51,5 +48,8 @@ namespace SpriteGallery.Util
 
             return result;
         }
+
+        public static void Retry(Action action, int numRetries = 1, int delayMs = 0) =>
+            Retry<object?>(() => { action(); return null; }, numRetries, delayMs);
     }
 }

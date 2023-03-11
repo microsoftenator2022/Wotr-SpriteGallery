@@ -36,6 +36,8 @@ namespace SpriteGallery
 
             foreach(var bundle in BundleFiles)
             {
+                // BlueprintReferencedAssets is an index of sorts.
+                // Maps "AssetId" and "FileId" from blueprints to assets like icons
                 var refAssets = bundle.ObjectIndex
                     .Where(o => o.ClassType == ClassIDType.MonoBehaviour)
                     .Select(o =>

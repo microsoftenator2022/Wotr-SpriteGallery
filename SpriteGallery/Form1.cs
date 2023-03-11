@@ -103,10 +103,48 @@ namespace SpriteGallery
         {
             switch (e.KeyData)
             {
-                case var k when k.HasFlag(Keys.Control) && k.HasFlag(Keys.C) :
+                case var k when k.HasFlag(Keys.Control) && k.HasFlag(Keys.C):
                     CopySelectedSpriteToClipboard();
                     break;
             }
+        }
+
+        internal bool SelectTileFromIds(string assetId, string fileIdStr)
+        {
+            var tile = gridView.Tiles
+                .Where(t => t.sprite.AssetId == assetId &&
+                    long.TryParse(fileIdStr, out var fileId) &&
+                    t.sprite.FileId == fileId)
+                .FirstOrDefault();
+
+            if (tile == default) return false;
+
+            if (tile.sprite != gridView.SelectedSprite)
+                gridView.SetSelected(tile.tile);
+
+            return true;
+        }
+
+        private void assetIDTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+
+            if (!SelectTileFromIds(assetIDTextBox.Text, fileIDTextBox.Text)) return;
+
+            gridView.Focus();
+
+            e.SuppressKeyPress = true;
+        }
+
+        private void fileIDTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+
+            if (!SelectTileFromIds(assetIDTextBox.Text, fileIDTextBox.Text)) return;
+
+            gridView.Focus();
+
+            e.SuppressKeyPress = true;
         }
     }
 }
