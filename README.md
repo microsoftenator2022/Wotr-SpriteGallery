@@ -1,5 +1,7 @@
 # SpriteGallery
 
-![image](https://user-images.githubusercontent.com/105488202/219570337-7a3a5889-fe79-4904-8bfa-6385074f2c71.png)
+Requires .NET 7 or later
 
-Built with .NET 7
+Based on BubbleAssets from [BubblePrints](https://github.com/factubsio/BubblePrints)
+
+![image](https://github.com/microsoftenator2022/Wotr-SpriteGallery/assets/105488202/39ca0204-86a8-4f50-b81e-d9597e03c3fe)
