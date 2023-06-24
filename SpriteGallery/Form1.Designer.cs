@@ -235,7 +235,7 @@
             label7.Padding = new Padding(8, 8, 0, 8);
             label7.Size = new Size(286, 90);
             label7.TabIndex = 16;
-            label7.Text = "Lookup Blueprint:\r\nEnter AssetID and FileID (optional) and press Enter\r\n\r\nSearch by name:\r\nEnter Name and press Enter";
+            label7.Text = "Lookup By ID:\r\nEnter AssetID and FileID (optional) and press Enter\r\n\r\nSearch by name:\r\nEnter Name and press Enter";
             label7.TextAlign = ContentAlignment.BottomRight;
             // 
             // Form1
