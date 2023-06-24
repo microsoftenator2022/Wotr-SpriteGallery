@@ -49,7 +49,6 @@ namespace SpriteGallery
                 
                 ReferencedBundles[bundle] = new(refAssets);
             }
-
         }
 
         internal IEnumerable<(string, BlueprintAssetReference, ObjectInfo)> GetSpriteAssets() =>
@@ -68,7 +67,7 @@ namespace SpriteGallery
         
         internal IEnumerable<SpriteInfo> LoadSprites()
         {
-            if(ReferencedBundles.Count == 0) return Enumerable.Empty<SpriteInfo>().ToList();
+            if(ReferencedBundles.Count == 0) return Enumerable.Empty<SpriteInfo>();
             
             return GetSpriteAssets()
                 .SelectMany(asset =>

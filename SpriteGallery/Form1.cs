@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 
 using SpriteGallery.Util;
 
+using static SpriteGallery.SpriteGridView;
+
 namespace SpriteGallery
 {
     public partial class Form1 : Form
@@ -125,6 +127,35 @@ namespace SpriteGallery
             return true;
         }
 
+        internal bool FindTileByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            var maybeMatch = gridView.Tiles
+                .Select(tile =>
+                {
+                    var intersection =
+                        tile.sprite.Sprite.Name
+                            .ToLowerInvariant()
+                            .OrderedIntersect(name.ToLowerInvariant());
+
+                    return (intersectSize: intersection.Count(), tile);
+                })
+                .Where(t => t.intersectSize > 0)
+                .OrderByDescending(t => t.intersectSize)
+                .Select(t => t.tile)
+                .FirstOrDefault();
+
+            if (maybeMatch == default)
+                return false;
+
+            if (maybeMatch.sprite != gridView.SelectedSprite)
+                gridView.SetSelected(maybeMatch.tile);
+
+            return true;
+        }
+
         private void assetIDTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
@@ -141,6 +172,17 @@ namespace SpriteGallery
             if (e.KeyCode != Keys.Enter) return;
 
             if (!SelectTileFromIds(assetIDTextBox.Text, fileIDTextBox.Text)) return;
+
+            gridView.Focus();
+
+            e.SuppressKeyPress = true;
+        }
+
+        private void nameTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+
+            if (!FindTileByName(nameTextBox.Text)) return;
 
             gridView.Focus();
 

@@ -39,6 +39,11 @@
             progressBar1 = new ProgressBar();
             gridView = new SpriteGridView();
             label4 = new Label();
+            label5 = new Label();
+            label6 = new Label();
+            label8 = new Label();
+            label9 = new Label();
+            label7 = new Label();
             SuspendLayout();
             // 
             // OpenBundleButton
@@ -94,14 +99,13 @@
             // nameTextBox
             // 
             nameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            nameTextBox.BackColor = SystemColors.ControlLight;
             nameTextBox.BorderStyle = BorderStyle.FixedSingle;
             nameTextBox.Font = new Font("Cascadia Mono", 9F, FontStyle.Regular, GraphicsUnit.Point);
             nameTextBox.Location = new Point(703, 148);
             nameTextBox.Name = "nameTextBox";
-            nameTextBox.ReadOnly = true;
             nameTextBox.Size = new Size(231, 21);
             nameTextBox.TabIndex = 2;
+            nameTextBox.KeyDown += nameTextBox_KeyDown;
             // 
             // label2
             // 
@@ -164,12 +168,75 @@
             // label4
             // 
             label4.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            label4.AutoSize = true;
-            label4.Location = new Point(711, 492);
+            label4.Location = new Point(808, 365);
+            label4.Margin = new Padding(0);
             label4.Name = "label4";
-            label4.Size = new Size(221, 60);
+            label4.Padding = new Padding(8, 8, 0, 8);
+            label4.Size = new Size(128, 46);
             label4.TabIndex = 10;
-            label4.Text = "Keyboard shortcuts:\r\n\r\nCtrl-C: Copy selected sprite to clipboard\r\nArrows: Page Up/Down - Move selection";
+            label4.Text = "Copy selected sprite to clipboard\r\n";
+            label4.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label5
+            // 
+            label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(648, 350);
+            label5.MinimumSize = new Size(286, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(286, 15);
+            label5.TabIndex = 11;
+            label5.Text = "Keyboard shortcuts";
+            label5.TextAlign = ContentAlignment.BottomCenter;
+            // 
+            // label6
+            // 
+            label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label6.Location = new Point(647, 365);
+            label6.Margin = new Padding(0);
+            label6.Name = "label6";
+            label6.Padding = new Padding(0, 8, 0, 8);
+            label6.Size = new Size(161, 46);
+            label6.TabIndex = 12;
+            label6.Text = "Ctrl+C";
+            label6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label8
+            // 
+            label8.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label8.Location = new Point(647, 413);
+            label8.Margin = new Padding(0);
+            label8.Name = "label8";
+            label8.Padding = new Padding(0, 8, 0, 8);
+            label8.Size = new Size(161, 46);
+            label8.TabIndex = 14;
+            label8.Text = "Arrows\r\nPgUp/PgDown";
+            label8.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label9
+            // 
+            label9.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label9.Location = new Point(808, 413);
+            label9.Margin = new Padding(0);
+            label9.Name = "label9";
+            label9.Padding = new Padding(8, 8, 0, 8);
+            label9.Size = new Size(128, 46);
+            label9.TabIndex = 15;
+            label9.Text = "Move Selection";
+            label9.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label7
+            // 
+            label7.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            label7.Location = new Point(648, 459);
+            label7.Margin = new Padding(0);
+            label7.Name = "label7";
+            label7.Padding = new Padding(8, 8, 0, 8);
+            label7.Size = new Size(286, 90);
+            label7.TabIndex = 16;
+            label7.Text = "Lookup Blueprint:\r\nEnter AssetID and FileID (optional) and press Enter\r\n\r\nSearch by name:\r\nEnter Name and press Enter";
+            label7.TextAlign = ContentAlignment.BottomRight;
             // 
             // Form1
             // 
@@ -177,6 +244,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLight;
             ClientSize = new Size(944, 561);
+            Controls.Add(label7);
+            Controls.Add(label9);
+            Controls.Add(label8);
+            Controls.Add(label6);
+            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(gridView);
             Controls.Add(progressBar1);
@@ -207,5 +279,10 @@
         private ProgressBar progressBar1;
         private SpriteGridView gridView;
         private Label label4;
+        private Label label5;
+        private Label label6;
+        private Label label8;
+        private Label label9;
+        private Label label7;
     }
 }

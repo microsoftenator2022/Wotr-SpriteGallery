@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,18 @@ namespace SpriteGallery.Util
 
             while (enumerator.MoveNext())
                 yield return (i++, enumerator.Current);
+        }
+
+        public static IEnumerable<T> OrderedIntersect<T>(this IEnumerable<T> sourceA, IEnumerable<T> sourceB)
+        {
+            sourceA = sourceA.Where(a => a != null);
+            sourceB = sourceB.Where(b => b != null);
+
+            return sourceA
+                .Zip(sourceB)
+                .SkipWhile(ab => !ab.First!.Equals(ab.Second))
+                .TakeWhile(ab => ab.First!.Equals(ab.Second))
+                .Select(ab => ab.First);
         }
     }
 
@@ -41,10 +54,12 @@ namespace SpriteGallery.Util
                         throw new Exception($"Failed after {retries} retries: {e}", e);
                     }
 
-                    if(delayMs > 0) Thread.Sleep(delayMs);
+                    if(delayMs >= 0) Thread.Sleep(delayMs);
                 }
                 finally { retries++; }
             }
+
+            if (retries > 0) Debug.Print($"Retries: {retries}");
 
             return result;
         }
