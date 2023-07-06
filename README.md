@@ -11,7 +11,7 @@ Version 3.0 includes a UMM mod to dump icons from the game. The gallery can also
 Usage:
 
 1. install SpriteDump like any other UMM mod
-2. Start the game and wait **a while** for it to finish. I think it is at least somewhat dependent on framerate, but it takes close to 10 minutes on my machine.
+2. Start the game and wait **a while** for it to finish. I think it is at least somewhat dependent on framerate, but it takes close to 10 minutes on my machine. You can check the progress in the mod title on the UMM menu
 3. There will now be a directory inside the mod's directory containing the icons exported as png files
 4. You can open this directory (the one containing the directories with numbers for names) in the gallery to browse the dumped icons
 
