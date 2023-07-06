@@ -20,9 +20,9 @@ namespace SpriteGallery
     {
         public readonly record struct Tile(int Column, int Row);
 
-        internal readonly List<BlueprintSprites.SpriteInfo> Sprites = new();
+        internal readonly List<SpriteInfo> Sprites = new();
 
-        internal IEnumerable<(Tile tile, BlueprintSprites.SpriteInfo sprite)> Tiles
+        internal IEnumerable<(Tile tile, SpriteInfo sprite)> Tiles
         {
             get
             {
@@ -65,7 +65,7 @@ namespace SpriteGallery
             this.Refresh();
         }
 
-        private void DrawSprite(int index, BlueprintSprites.SpriteInfo sprite, Graphics g)
+        private void DrawSprite(int index, SpriteInfo sprite, Graphics g)
         {
             var rect = TileRect(TileForIndex(index));
 
@@ -113,7 +113,7 @@ namespace SpriteGallery
             }
         }
 
-        internal BlueprintSprites.SpriteInfo? GetSprite(Tile? tile)
+        internal SpriteInfo? GetSprite(Tile? tile)
         {
             if(tile is not Tile t) return null;
 
@@ -122,7 +122,7 @@ namespace SpriteGallery
             return Sprites.Count > index ? Sprites[index] : null;
         }
 
-        internal BlueprintSprites.SpriteInfo? SelectedSprite => GetSprite(Selected);
+        internal SpriteInfo? SelectedSprite => GetSprite(Selected);
 
         internal Tile? Selected { get; private set; }
         

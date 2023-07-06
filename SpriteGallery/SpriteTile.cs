@@ -12,9 +12,9 @@ namespace SpriteGallery
 {
     public partial class SpriteTile : Control
     {
-        private BlueprintSprites.SpriteInfo? sprite;
+        private SpriteInfo? sprite;
 
-        internal BlueprintSprites.SpriteInfo? Sprite
+        internal SpriteInfo? Sprite
         {
             get => sprite;
             set

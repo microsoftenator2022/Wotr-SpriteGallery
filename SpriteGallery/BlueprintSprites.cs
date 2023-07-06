@@ -10,10 +10,53 @@ using WikiGen.Assets;
 
 namespace SpriteGallery
 {
-    internal class BlueprintSprites
+    internal interface ISpriteCollection
     {
-        public readonly record struct SpriteInfo(string AssetId, long FileId, Sprite Sprite, Image Image);
-        
+        int Count { get; }
+        IEnumerable<SpriteInfo> Sprites { get; }
+    }
+
+    internal class DumpedSprites : ISpriteCollection
+    {
+        public readonly string DumpLocation;
+
+        public DumpedSprites(string dumpLocation)
+        {
+            DumpLocation = dumpLocation;
+        }
+
+        private IEnumerable<Lazy<SpriteInfo>> GetGetters()
+        {
+            foreach (var ((fileId, assetId, name), path) in 
+                Directory.EnumerateFiles(DumpLocation, "index.csv", SearchOption.AllDirectories)
+                .SelectMany(f =>
+                {
+                    var lines = File.ReadAllLines(f);
+                    return lines
+                        .Select(l => l.Split(','))
+                        .Where(fields => fields.Length == 3)
+                        .Select(fields => (fileId: fields[0], assetId: fields[1], name: fields[2]));
+                })
+                .Select(entry => (entry, path: Path.Join(DumpLocation, entry.fileId, $"{entry.assetId}.png")))
+                .Where(entryAndPath => File.Exists(entryAndPath.path)))
+            {
+                yield return new(() => new SpriteInfo(assetId, long.Parse(fileId), name, Image.FromFile(path)));
+            }
+        }
+
+        private Lazy<SpriteInfo>[]? spriteGetters;
+        private Lazy<SpriteInfo>[] SpriteGetters => spriteGetters ??= GetGetters().ToArray();
+
+        public int Count => SpriteGetters.Length;
+        public IEnumerable<SpriteInfo> Sprites => SpriteGetters.Select(s => s.Value);
+    }
+
+    internal readonly record struct SpriteInfo(string AssetId, long FileId, string Name, Image Image);
+
+    internal class BlueprintSprites : ISpriteCollection
+    {
+        //public readonly record struct SpriteInfo(string AssetId, long FileId, Sprite Sprite, Image Image);
+
         internal AssetContext AssetContext { get; init; }
         internal List<AssetFile> BundleFiles { get; set; } = new();
         //internal BlueprintAssetsContext? BlueprintContext { get; set; }
@@ -51,7 +94,7 @@ namespace SpriteGallery
             }
         }
 
-        internal IEnumerable<(string, BlueprintAssetReference, ObjectInfo)> GetSpriteAssets() =>
+        private IEnumerable<(string, BlueprintAssetReference, ObjectInfo)> GetSpriteAssets() =>
             ReferencedBundles.SelectMany(b => b.Value.AssetRefs)
                 .SelectMany(assetRef =>
                 {
@@ -65,7 +108,9 @@ namespace SpriteGallery
                 })
                 .Where(asset => { var (_, _, o) = asset; return o.ClassType == ClassIDType.Sprite; });
         
-        internal IEnumerable<SpriteInfo> LoadSprites()
+        public int Count => GetSpriteAssets().Count();
+
+        private IEnumerable<SpriteInfo> LoadSprites()
         {
             if(ReferencedBundles.Count == 0) return Enumerable.Empty<SpriteInfo>();
             
@@ -79,7 +124,7 @@ namespace SpriteGallery
                     if (!BlueprintAssetsContext.TryRenderSprite(sprite, out Bitmap? bitmap))
                         return Enumerable.Empty<SpriteInfo>();
 
-                    return new[] { new SpriteInfo(id, assetRef.FileId, sprite, bitmap) };
+                    return new[] { new SpriteInfo(id, assetRef.FileId, sprite.Name, bitmap) };
                 });
         }
 

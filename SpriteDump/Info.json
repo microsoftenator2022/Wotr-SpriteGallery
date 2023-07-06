@@ -1,0 +1,10 @@
+{
+  "Id": "SpriteDump",
+  "Version": "1.0.0.0",
+  "AssemblyName": "SpriteDump.dll",
+  "EntryMethod": "SpriteDump.Main.Load",
+
+  "DisplayName": "Sprite Dump",
+
+  "Author": "microsoftenator"
+}

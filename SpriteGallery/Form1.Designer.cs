@@ -44,6 +44,7 @@
             label8 = new Label();
             label9 = new Label();
             label7 = new Label();
+            OpenDumpButton = new Button();
             SuspendLayout();
             // 
             // OpenBundleButton
@@ -143,9 +144,9 @@
             // progressBar1
             // 
             progressBar1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            progressBar1.Location = new Point(115, 11);
+            progressBar1.Location = new Point(218, 11);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(527, 23);
+            progressBar1.Size = new Size(424, 23);
             progressBar1.TabIndex = 9;
             // 
             // gridView
@@ -236,7 +237,22 @@
             label7.Size = new Size(286, 90);
             label7.TabIndex = 16;
             label7.Text = "Lookup By ID:\r\nEnter AssetID and FileID (optional) and press Enter\r\n\r\nSearch by name:\r\nEnter Name and press Enter";
-            label7.TextAlign = ContentAlignment.BottomRight;
+            label7.TextAlign = ContentAlignment.BottomLeft;
+            // 
+            // OpenDumpButton
+            // 
+            OpenDumpButton.BackColor = SystemColors.ButtonFace;
+            OpenDumpButton.FlatAppearance.BorderColor = SystemColors.WindowFrame;
+            OpenDumpButton.FlatAppearance.MouseDownBackColor = SystemColors.ButtonShadow;
+            OpenDumpButton.FlatAppearance.MouseOverBackColor = SystemColors.ButtonHighlight;
+            OpenDumpButton.FlatStyle = FlatStyle.Flat;
+            OpenDumpButton.Location = new Point(115, 10);
+            OpenDumpButton.Name = "OpenDumpButton";
+            OpenDumpButton.Size = new Size(97, 25);
+            OpenDumpButton.TabIndex = 17;
+            OpenDumpButton.Text = "From dump...";
+            OpenDumpButton.UseVisualStyleBackColor = false;
+            OpenDumpButton.Click += OpenDumpButton_Click;
             // 
             // Form1
             // 
@@ -244,6 +260,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLight;
             ClientSize = new Size(944, 561);
+            Controls.Add(OpenDumpButton);
             Controls.Add(label7);
             Controls.Add(label9);
             Controls.Add(label8);
@@ -284,5 +301,6 @@
         private Label label8;
         private Label label9;
         private Label label7;
+        private Button OpenDumpButton;
     }
 }

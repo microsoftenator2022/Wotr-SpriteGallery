@@ -181,6 +181,31 @@ namespace WikiGen.Assets
             return nodes;
         }
 
+        //private static IEnumerable<TypeTreeNode> GetNodes(IEnumerable<TypeTreeNode> m_Nodes, int index)
+        //{
+        //    var nodesFromIndex = m_Nodes.Skip(index);
+        //    var level = nodesFromIndex.First().Level;
+
+        //    foreach(var node in nodesFromIndex)
+        //    {
+        //        var level2 = node.Level;
+        //        if (level2 <= level)
+        //            yield break;
+
+        //        yield return node;
+        //    }
+        //}
+
+        public static IEnumerable<(TypeTreeNode, object)> ReadTypeEnumerable(List<TypeTreeNode> m_Nodes, AssetFileReader reader)
+        { 
+            reader.Reset();
+
+            for (int i = 1; i < m_Nodes.Count; i++)
+            {
+                yield return (m_Nodes[i], ReadValue(m_Nodes, reader, ref i));
+            }
+        }
+
         public static OrderedDictionary ReadType(List<TypeTreeNode> m_Nodes, AssetFileReader reader)
         {
             reader.Reset();

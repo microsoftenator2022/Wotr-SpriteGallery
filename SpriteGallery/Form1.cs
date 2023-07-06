@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 
 using SpriteGallery.Util;
 
+using WikiGen.Assets;
+
 using static SpriteGallery.SpriteGridView;
 
 namespace SpriteGallery
@@ -28,13 +30,13 @@ namespace SpriteGallery
                 }
 
                 assetIDTextBox.Text = $"{sprite.Value.AssetId}";
-                nameTextBox.Text = $"{sprite.Value.Sprite.Name}";
+                nameTextBox.Text = $"{sprite.Value.Name}";
                 fileIDTextBox.Text = $"{sprite.Value.FileId}";
 
             };
         }
 
-        internal BlueprintSprites? Sprites { get; set; } = null;
+        internal ISpriteCollection? Sprites { get; set; } = null;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -55,17 +57,19 @@ namespace SpriteGallery
 
             var bundleFilePath = dialog.FileName;
 
-            Sprites = new();
+            var sprites = new BlueprintSprites();
+
+            Sprites = sprites;
 
             var loadTask = new Task(() =>
             {
-                Sprites.AddBundle(bundleFilePath);
+                sprites.AddBundle(bundleFilePath);
 
                 this.Invoke(() =>
                 {
                     lock (this)
                     {
-                        progressBar1.Maximum = Sprites.GetSpriteAssets().Count();
+                        progressBar1.Maximum = Sprites.Count;
                         progressBar1.Value = 0;
                     }
                 });
@@ -92,9 +96,48 @@ namespace SpriteGallery
             loadTask.Start();
         }
 
+        private void OpenDumpButton_Click(object sender, EventArgs e)
+        {
+            var dialog = new FolderBrowserDialog();
+
+            var result = dialog.ShowDialog();
+
+            if (result is not DialogResult.OK) return;
+
+            var sprites = new DumpedSprites(dialog.SelectedPath);
+
+            Sprites = sprites;
+
+            Task.Run (() =>
+            {
+                this.Invoke(() =>
+                {
+                    lock (this)
+                    {
+                        progressBar1.Maximum = Sprites.Count;
+                        progressBar1.Value = 0;
+                    }
+                });
+
+                foreach (var sprite in Sprites.Sprites)
+                {
+                    this.Invoke(() =>
+                    {
+                        lock (this)
+                        {
+                            gridView.Sprites.Add(sprite);
+                            progressBar1.Value++;
+                        }
+                    });
+                }
+
+                this.Invoke(() => gridView.ApplyLayout());
+            });
+        }
+
         private void CopySelectedSpriteToClipboard()
         {
-            if (gridView.SelectedSprite is not BlueprintSprites.SpriteInfo sprite) return;
+            if (gridView.SelectedSprite is not SpriteInfo sprite) return;
 
             Utils.Retry(() => Clipboard.SetImage(sprite.Image), 3, 100);
 
@@ -136,7 +179,7 @@ namespace SpriteGallery
                 .Select(tile =>
                 {
                     var intersection =
-                        tile.sprite.Sprite.Name
+                        tile.sprite.Name
                             .ToLowerInvariant()
                             .OrderedIntersect(name.ToLowerInvariant());
 
@@ -188,5 +231,6 @@ namespace SpriteGallery
 
             e.SuppressKeyPress = true;
         }
+
     }
 }
