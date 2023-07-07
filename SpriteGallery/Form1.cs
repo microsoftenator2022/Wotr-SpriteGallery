@@ -61,6 +61,8 @@ namespace SpriteGallery
 
             Sprites = sprites;
 
+            gridView.Sprites.Clear();
+
             var loadTask = new Task(() =>
             {
                 sprites.AddBundle(bundleFilePath);
@@ -108,7 +110,9 @@ namespace SpriteGallery
 
             Sprites = sprites;
 
-            Task.Run (() =>
+            gridView.Sprites.Clear();
+
+            Task.Run(() =>
             {
                 this.Invoke(() =>
                 {

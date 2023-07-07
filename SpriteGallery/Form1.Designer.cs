@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             OpenBundleButton = new Button();
             assetIDTextBox = new TextBox();
             spriteTileBig = new SpriteTile();
@@ -277,6 +278,7 @@
             Controls.Add(spriteTileBig);
             Controls.Add(assetIDTextBox);
             Controls.Add(OpenBundleButton);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
