@@ -13,7 +13,9 @@ Version 3.0 includes a UMM mod to dump sprites from the game. The gallery can al
 1. install SpriteDump like any other UMM mod. Your mods folder should have a folder named "SpriteDump"
 ![image](https://github.com/microsoftenator2022/Wotr-SpriteGallery/assets/105488202/d4592a29-2385-4eea-b3e1-dacece887e2c)
 
-2. Start the game and wait **a while** for it to finish. I think it is at least somewhat dependent on framerate, but it takes close to 10 minutes on my machine. You can check the progress in the UMM menu
+2. Start the game and wait **a while** for it to finish. I think it is at least somewhat dependent on framerate, but it takes close to 10 minutes on my machine. You can check the progress in the UMM menu.
+
+    The mod will skip any existing files so it doesn't matter if you leave it installed after it's finished
 ![image](https://github.com/microsoftenator2022/Wotr-SpriteGallery/assets/105488202/e1c8fd9a-ea72-4bce-9d0b-c69f48c03d80)
 
 3. There will now be a directory inside the mod's directory containing the icons exported as png files, grouped by "FileID"
