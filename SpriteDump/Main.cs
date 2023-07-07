@@ -29,7 +29,7 @@ namespace SpriteDump
         internal static Harmony Harmony = null!;
 
         internal static string OutputDirectory { get; set; } =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SpriteDump");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Dump");
             //$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{Path.DirectorySeparatorChar}SpriteDump";
 
         public static bool Load(UnityModManager.ModEntry modEntry)
@@ -38,7 +38,7 @@ namespace SpriteDump
 
             Harmony = new(ModEntry.Info.Id);
 
-            OutputDirectory = Path.Combine(ModEntry.Path, "SpriteDump");
+            OutputDirectory = Path.Combine(ModEntry.Path, "Dump");
 
             Harmony.PatchAll();
 
