@@ -43,6 +43,8 @@ namespace WikiGen.Assets
                 if (path.EndsWith(".nav")) continue;
                 if (path.EndsWith(".animations")) continue;
 
+                Debug.WriteLine($"Adding bundle {path}");
+
                 tasks.Add(Task.Run(() =>
                 {
                     AddBundle(path);
@@ -68,11 +70,11 @@ namespace WikiGen.Assets
                 }
             }
 
-            Console.WriteLine($"could not resolve {unresolved.Count} bundles (out of {totalExternal} total");
+            Debug.WriteLine($"could not resolve {unresolved.Count} bundles (out of {totalExternal} total");
 
 
             now.Stop();
-            Console.WriteLine($"Indexed {totalBundleCount} bundles " +
+            Debug.WriteLine($"Indexed {totalBundleCount} bundles " +
                 $"({assetIndex.Values.Sum(x => x.ObjectIndex.Count)} assets and {resourceStreams.Count} resS) " +
                 $"in {now.Elapsed.TotalMilliseconds / 1000.0} seconds");
 

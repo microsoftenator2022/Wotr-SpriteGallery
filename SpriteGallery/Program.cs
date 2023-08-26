@@ -2,6 +2,10 @@ namespace SpriteGallery
 {
     internal static class Program
     {
+        internal static readonly Log Log = new(
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "WotrSpriteGallery", "log.txt"));
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>

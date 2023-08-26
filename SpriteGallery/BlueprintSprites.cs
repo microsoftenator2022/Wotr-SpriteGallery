@@ -27,11 +27,17 @@ namespace SpriteGallery
 
         private IEnumerable<Lazy<SpriteInfo>> GetGetters()
         {
+            Program.Log.WriteLine($"Dump: {DumpLocation}");
             foreach (var ((fileId, assetId, name), path) in 
                 Directory.EnumerateFiles(DumpLocation, "index.csv", SearchOption.AllDirectories)
                 .SelectMany(f =>
                 {
+                    Program.Log.WriteLine($"Loading from {f}");
+
                     var lines = File.ReadAllLines(f);
+
+                    Program.Log.WriteLine($"  {lines.Length} entries");
+
                     return lines
                         .Select(l => l.Split(','))
                         .Where(fields => fields.Length == 3)
@@ -73,24 +79,40 @@ namespace SpriteGallery
 
         public void AddBundle(string bundlePath)
         {
-            AssetContext.AddBundle(bundlePath);
-
-            BundleFiles = AssetContext.assetsByBundle.First().Value;
-
-            foreach(var bundle in BundleFiles)
+            Program.Log.WriteLine($"{nameof(AddBundle)} {bundlePath}");
+            try
             {
-                // BlueprintReferencedAssets is an index of sorts.
-                // Maps "AssetId" and "FileId" from blueprints to assets like icons
-                var refAssets = bundle.ObjectIndex
-                    .Where(o => o.ClassType == ClassIDType.MonoBehaviour)
-                    .Select(o =>
-                    {
-                        using var reader = new AssetFileReader(o);
-                        return TreeDumper.ReadType(o.serializedType.TypeTree, reader);
-                    })
-                    .First(asset => asset["m_Name"] as string == "BlueprintReferencedAssets");
-                
-                ReferencedBundles[bundle] = new(refAssets);
+                AssetContext.AddBundle(bundlePath);
+
+                BundleFiles = AssetContext.assetsByBundle.First().Value;
+
+                Program.Log.WriteLine($"{BundleFiles.Count()} bundle files");
+
+                foreach(var bundle in BundleFiles)
+                {
+                    // BlueprintReferencedAssets is an index of sorts.
+                    // Maps "AssetId" and "FileId" from blueprints to assets like icons
+                    var refAssets = bundle.ObjectIndex
+                        .Where(o => o.ClassType == ClassIDType.MonoBehaviour)
+                        .Select(o =>
+                        {
+                            using var reader = new AssetFileReader(o);
+                            return TreeDumper.ReadType(o.serializedType.TypeTree, reader);
+                        })
+                        .First(asset => asset["m_Name"] as string == "BlueprintReferencedAssets");
+
+                    Program.Log.WriteLine($"Owning bundle: {bundle.OwningBundle} {refAssets.Count} assets");
+
+                    ReferencedBundles[bundle] = new(refAssets);
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.Log.WriteLine($"EXCEPTION loading bundle from {bundlePath}");
+                Program.Log.WriteLine(ex.ToString());
+#if DEBUG
+                throw;
+#endif
             }
         }
 
