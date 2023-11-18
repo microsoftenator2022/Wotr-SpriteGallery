@@ -16,11 +16,12 @@ using WikiGen.Assets;
 namespace SpriteGallery
 {
     
-    public partial class SpriteGridView : ScrollableControl
+    public partial class SpriteGridView : ScrollableControl, ISpritesView
     {
         public readonly record struct Tile(int Column, int Row);
 
-        internal readonly List<SpriteInfo> Sprites = new();
+        public readonly List<SpriteInfo> Sprites = new();
+        IList<SpriteInfo> ISpritesView.Sprites => Sprites;
 
         internal IEnumerable<(Tile tile, SpriteInfo sprite)> Tiles
         {
@@ -122,7 +123,7 @@ namespace SpriteGallery
             return Sprites.Count > index ? Sprites[index] : null;
         }
 
-        internal SpriteInfo? SelectedSprite => GetSprite(Selected);
+        public SpriteInfo? SelectedSprite => GetSprite(Selected);
 
         internal Tile? Selected { get; private set; }
         
@@ -136,11 +137,11 @@ namespace SpriteGallery
             OnSelectedChanged(Selected, previous);
         }
 
-        public event Action<Tile?, Tile?> SelectedChanged;
+        private event Action<Tile?, Tile?> SelectedTileChanged;
         
         protected void OnSelectedChanged(Tile? tile, Tile? previous)
         {
-            SelectedChanged?.Invoke(tile, previous);
+            SelectedTileChanged?.Invoke(tile, previous);
 
             if (tile is Tile selectedTile)
             {
@@ -216,9 +217,8 @@ namespace SpriteGallery
 
             Padding = new Padding(0, 0, SystemInformation.VerticalScrollBarWidth, 0);
 
-            SelectedChanged += (selected, _) =>
+            SelectedTileChanged += (selected, _) =>
             {
-
                 Rectangle? tileRect = selected is Tile t ? TileRect(t) : null;
 
                 if (tileRect is Rectangle rect)
@@ -228,9 +228,13 @@ namespace SpriteGallery
                     this.ScrollControlIntoView(dummy);
                     Controls.Remove(dummy);
                 }
+
+                SelectedChanged(GetSprite(selected));
             };
         }
 
+        public event Action<SpriteInfo?> SelectedChanged = _ => { };
+        
         protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
         {
             switch (e.KeyData)

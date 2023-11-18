@@ -57,7 +57,7 @@ namespace SpriteGallery
         public IEnumerable<SpriteInfo> Sprites => SpriteGetters.Select(s => s.Value);
     }
 
-    internal readonly record struct SpriteInfo(string AssetId, long FileId, string Name, Image Image);
+    public readonly record struct SpriteInfo(string AssetId, long FileId, string Name, Image Image);
 
     internal class BlueprintSprites : ISpriteCollection
     {
