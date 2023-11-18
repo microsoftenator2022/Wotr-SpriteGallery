@@ -39,6 +39,8 @@
             label3 = new Label();
             progressBar1 = new ProgressBar();
             gridView = new SpriteGridView();
+            label10 = new Label();
+            viewOptionsButton = new Button();
             label4 = new Label();
             label5 = new Label();
             label6 = new Label();
@@ -46,6 +48,17 @@
             label9 = new Label();
             label7 = new Label();
             OpenDumpButton = new Button();
+            spritesViewPanel = new Panel();
+            SpritesViewPanelInner = new Panel();
+            OptionsPanel = new Panel();
+            NameFilterTextBox = new TextBox();
+            NameFilterLabel = new Label();
+            SpritesViewModeLabel = new Label();
+            viewModeDropDown = new ComboBox();
+            gridView.SuspendLayout();
+            spritesViewPanel.SuspendLayout();
+            SpritesViewPanelInner.SuspendLayout();
+            OptionsPanel.SuspendLayout();
             SuspendLayout();
             // 
             // OpenBundleButton
@@ -152,12 +165,14 @@
             // 
             // gridView
             // 
-            gridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             gridView.AutoScroll = true;
             gridView.AutoScrollMinSize = new Size(1, 462);
             gridView.BackColor = SystemColors.ControlDarkDark;
+            gridView.Controls.Add(label10);
+            gridView.Dock = DockStyle.Fill;
             gridView.ForeColor = SystemColors.Highlight;
-            gridView.Location = new Point(12, 41);
+            gridView.Location = new Point(0, 0);
+            gridView.Margin = new Padding(0);
             gridView.Name = "gridView";
             gridView.Padding = new Padding(0, 0, 17, 0);
             gridView.Size = new Size(630, 508);
@@ -166,6 +181,31 @@
             gridView.TileMargin = 1;
             gridView.TileWidth = 64;
             gridView.KeyUp += gridView_KeyPress;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Segoe UI", 20F, FontStyle.Bold, GraphicsUnit.Point);
+            label10.ForeColor = Color.DarkRed;
+            label10.Location = new Point(60, 131);
+            label10.Name = "label10";
+            label10.Size = new Size(437, 74);
+            label10.TabIndex = 19;
+            label10.Text = "Mouse over top-left of grid view\r\nto see options dropdown";
+            // 
+            // viewOptionsButton
+            // 
+            viewOptionsButton.BackColor = SystemColors.ButtonFace;
+            viewOptionsButton.FlatAppearance.BorderSize = 0;
+            viewOptionsButton.FlatStyle = FlatStyle.Flat;
+            viewOptionsButton.Font = new Font("Segoe UI Emoji", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            viewOptionsButton.Location = new Point(0, 0);
+            viewOptionsButton.Margin = new Padding(0);
+            viewOptionsButton.Name = "viewOptionsButton";
+            viewOptionsButton.Size = new Size(33, 33);
+            viewOptionsButton.TabIndex = 2;
+            viewOptionsButton.Text = "⬇️";
+            viewOptionsButton.UseVisualStyleBackColor = false;
             // 
             // label4
             // 
@@ -255,12 +295,88 @@
             OpenDumpButton.UseVisualStyleBackColor = false;
             OpenDumpButton.Click += OpenDumpButton_Click;
             // 
+            // spritesViewPanel
+            // 
+            spritesViewPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            spritesViewPanel.BackColor = Color.Transparent;
+            spritesViewPanel.Controls.Add(SpritesViewPanelInner);
+            spritesViewPanel.Controls.Add(OptionsPanel);
+            spritesViewPanel.Controls.Add(viewOptionsButton);
+            spritesViewPanel.Location = new Point(12, 41);
+            spritesViewPanel.Name = "spritesViewPanel";
+            spritesViewPanel.Size = new Size(630, 508);
+            spritesViewPanel.TabIndex = 18;
+            // 
+            // SpritesViewPanelInner
+            // 
+            SpritesViewPanelInner.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            SpritesViewPanelInner.Controls.Add(gridView);
+            SpritesViewPanelInner.Location = new Point(0, 33);
+            SpritesViewPanelInner.Margin = new Padding(0);
+            SpritesViewPanelInner.Name = "SpritesViewPanelInner";
+            SpritesViewPanelInner.Size = new Size(630, 508);
+            SpritesViewPanelInner.TabIndex = 3;
+            // 
+            // OptionsPanel
+            // 
+            OptionsPanel.BackColor = SystemColors.Control;
+            OptionsPanel.Controls.Add(NameFilterTextBox);
+            OptionsPanel.Controls.Add(NameFilterLabel);
+            OptionsPanel.Controls.Add(SpritesViewModeLabel);
+            OptionsPanel.Controls.Add(viewModeDropDown);
+            OptionsPanel.Location = new Point(33, 0);
+            OptionsPanel.Margin = new Padding(0);
+            OptionsPanel.Name = "OptionsPanel";
+            OptionsPanel.Size = new Size(597, 33);
+            OptionsPanel.TabIndex = 0;
+            // 
+            // NameFilterTextBox
+            // 
+            NameFilterTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            NameFilterTextBox.Location = new Point(78, 5);
+            NameFilterTextBox.Name = "NameFilterTextBox";
+            NameFilterTextBox.Size = new Size(200, 23);
+            NameFilterTextBox.TabIndex = 3;
+            // 
+            // NameFilterLabel
+            // 
+            NameFilterLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            NameFilterLabel.AutoSize = true;
+            NameFilterLabel.Location = new Point(3, 8);
+            NameFilterLabel.Name = "NameFilterLabel";
+            NameFilterLabel.Size = new Size(69, 15);
+            NameFilterLabel.TabIndex = 2;
+            NameFilterLabel.Text = "Name filter:";
+            // 
+            // SpritesViewModeLabel
+            // 
+            SpritesViewModeLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            SpritesViewModeLabel.AutoSize = true;
+            SpritesViewModeLabel.Location = new Point(401, 8);
+            SpritesViewModeLabel.Name = "SpritesViewModeLabel";
+            SpritesViewModeLabel.Size = new Size(66, 15);
+            SpritesViewModeLabel.TabIndex = 1;
+            SpritesViewModeLabel.Text = "View Mode";
+            // 
+            // viewModeDropDown
+            // 
+            viewModeDropDown.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            viewModeDropDown.DropDownStyle = ComboBoxStyle.DropDownList;
+            viewModeDropDown.FlatStyle = FlatStyle.Flat;
+            viewModeDropDown.FormattingEnabled = true;
+            viewModeDropDown.Items.AddRange(new object[] { "Grid", "List" });
+            viewModeDropDown.Location = new Point(473, 5);
+            viewModeDropDown.Name = "viewModeDropDown";
+            viewModeDropDown.Size = new Size(121, 23);
+            viewModeDropDown.TabIndex = 0;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLight;
             ClientSize = new Size(944, 561);
+            Controls.Add(spritesViewPanel);
             Controls.Add(OpenDumpButton);
             Controls.Add(label7);
             Controls.Add(label9);
@@ -268,7 +384,6 @@
             Controls.Add(label6);
             Controls.Add(label5);
             Controls.Add(label4);
-            Controls.Add(gridView);
             Controls.Add(progressBar1);
             Controls.Add(label3);
             Controls.Add(fileIDTextBox);
@@ -281,6 +396,12 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Form1";
             Text = "Form1";
+            gridView.ResumeLayout(false);
+            gridView.PerformLayout();
+            spritesViewPanel.ResumeLayout(false);
+            SpritesViewPanelInner.ResumeLayout(false);
+            OptionsPanel.ResumeLayout(false);
+            OptionsPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -304,5 +425,14 @@
         private Label label9;
         private Label label7;
         private Button OpenDumpButton;
+        private Panel spritesViewPanel;
+        private Button viewOptionsButton;
+        private Panel OptionsPanel;
+        private ComboBox viewModeDropDown;
+        private Label SpritesViewModeLabel;
+        private Panel SpritesViewPanelInner;
+        private TextBox NameFilterTextBox;
+        private Label NameFilterLabel;
+        private Label label10;
     }
 }

@@ -1,40 +1,149 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+
+using DotNet.Globbing;
 
 using SpriteGallery.Util;
 
 using WikiGen.Assets;
 
-using static SpriteGallery.SpriteGridView;
-
 namespace SpriteGallery
 {
     public partial class Form1 : Form
     {
+        void OnSelectedChanged(SpriteInfo? sprite)
+        {
+            spriteTileBig.Sprite = sprite;
+
+            if (sprite is null)
+            {
+                nameTextBox.Text = "Nothing selected";
+                assetIDTextBox.Text = fileIDTextBox.Text = "";
+                return;
+            }
+
+            assetIDTextBox.Text = $"{sprite.Value.AssetId}";
+            nameTextBox.Text = $"{sprite.Value.Name}";
+            fileIDTextBox.Text = $"{sprite.Value.FileId}";
+        }
+
+        ISpritesView currentView;
+
+        bool optionsPanelVisible = false;
+        bool OptionsPanelVisible {
+            get => optionsPanelVisible;
+            set
+            {
+                optionsPanelVisible = value;
+                
+                spritesViewPanel.SuspendLayout();
+                SpritesViewPanelInner.SuspendLayout();
+                OptionsPanel.SuspendLayout();
+
+                OptionsPanel.Enabled = optionsPanelVisible;
+                OptionsPanel.Visible = optionsPanelVisible;
+
+                if (optionsPanelVisible)
+                {
+                    SpritesViewPanelInner.Location = new(0, OptionsPanel.Height);
+                    SpritesViewPanelInner.Size = SpritesViewPanelInner.Size with { Height = SpritesViewPanelInner.Size.Height - OptionsPanel.Height };
+                }
+                else
+                {
+                    SpritesViewPanelInner.Location = new(0, 0);
+                    SpritesViewPanelInner.Size = SpritesViewPanelInner.Size with { Height = SpritesViewPanelInner.Size.Height + OptionsPanel.Height };
+                }
+
+                spritesViewPanel.ResumeLayout();
+                SpritesViewPanelInner.ResumeLayout();
+                OptionsPanel.ResumeLayout();
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
 
-            gridView.SelectedChanged += (tile, _) =>
+            viewModeDropDown.Enabled = false;
+            viewModeDropDown.Visible = false;
+            SpritesViewModeLabel.Enabled = false;
+            SpritesViewModeLabel.Visible = false;
+
+            currentView = gridView;
+
+            gridView.SelectedChanged += OnSelectedChanged;
+
+            viewModeDropDown.SelectedIndexChanged += (_, _) =>
             {
-                var sprite = gridView.GetSprite(tile);
-
-                spriteTileBig.Sprite = sprite;
-
-                if (sprite is null)
+                currentView = viewModeDropDown.SelectedIndex switch
                 {
-                    nameTextBox.Text = "Nothing selected";
-                    assetIDTextBox.Text = fileIDTextBox.Text = "";
-                    return;
+                    _ => gridView
+                };
+            };
+
+            viewModeDropDown.SelectedIndex = 0;
+
+            gridView.MouseMove += (_, args) =>
+            {
+                var xMin = viewOptionsButton.Location.X;
+                var xMax = xMin + viewOptionsButton.Width;
+                var yMin = viewOptionsButton.Location.Y;
+                var yMax = yMin + viewOptionsButton.Height;
+
+                if (args.X > xMin && args.X < xMax && args.Y > yMin && args.Y < yMax)
+                {
+                    viewOptionsButton.BringToFront();
+                }
+            };
+
+            OptionsPanelVisible = false;
+
+            viewOptionsButton.MouseLeave += (_, _) => viewOptionsButton.SendToBack();
+
+            viewOptionsButton.Click += (_, _) =>
+            {
+                OptionsPanelVisible = !OptionsPanelVisible;
+
+                OptionsPanel.Visible = OptionsPanelVisible;
+
+                if (OptionsPanelVisible)
+                {
+                    viewOptionsButton.Text = "⬆️";
+                }
+                else
+                {
+                    viewOptionsButton.Text = "⬇️";
                 }
 
-                assetIDTextBox.Text = $"{sprite.Value.AssetId}";
-                nameTextBox.Text = $"{sprite.Value.Name}";
-                fileIDTextBox.Text = $"{sprite.Value.FileId}";
+                gridView.ApplyLayout();
+            };
 
+            spriteFilterGlob = Glob.Parse("*");
+
+            var globOptions = GlobOptions.Default;
+            globOptions.Evaluation.CaseInsensitive = true;
+
+            NameFilterTextBox.TextChanged += (_, args) =>
+            {
+                if (string.IsNullOrWhiteSpace(NameFilterTextBox.Text))
+                {
+                    spriteFilterGlob = Glob.Parse("*");
+                }
+                else
+                {
+                    spriteFilterGlob = Glob.Parse("*" + NameFilterTextBox.Text + "*", globOptions);
+                }
+
+                gridView.Sprites.Clear();
+                gridView.Sprites.AddRange(filteredSprites);
+                gridView.ApplyLayout();
             };
         }
+
+        Glob spriteFilterGlob;
+        IEnumerable<SpriteInfo> filteredSprites =>
+            Sprites?.Sprites?.Where(sprite => spriteFilterGlob.IsMatch(sprite.Name)) ??
+            System.Linq.Enumerable.Empty<SpriteInfo>();
 
         internal ISpriteCollection? Sprites { get; set; } = null;
 
@@ -69,6 +178,9 @@ namespace SpriteGallery
 
                 this.Invoke(() =>
                 {
+                    label10.Visible = false;
+                    label10.Enabled = false;
+
                     lock (this)
                     {
                         progressBar1.Maximum = Sprites.Count;
@@ -116,6 +228,9 @@ namespace SpriteGallery
             {
                 this.Invoke(() =>
                 {
+                    label10.Visible = false;
+                    label10.Enabled = false;
+
                     lock (this)
                     {
                         progressBar1.Maximum = Sprites.Count;
